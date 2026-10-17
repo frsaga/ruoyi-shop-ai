@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>学生信息表</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 60%;
+      margin: 30px auto;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      text-align: center;
+      padding: 8px;
+    }
+
+    .btn-box {
+      text-align: center;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="btn-box">
+  <input type="button" value="点我" onclick="test()" />
+</div>
+
+<div id="table-container"></div>
+
+<script>
+  // 学生数组
+  let students = [
+    {name: '小明', age: 18, gender: '男', hometown: '河北省'},
+    {name: '小红', age: 19, gender: '女', hometown: '河南省'},
+    {name: '小刚', age: 17, gender: '男', hometown: '山西省'},
+    {name: '小丽', age: 18, gender: '女', hometown: '山东省'}
+  ];
+
+  // 点击按钮时显示表格
+  function test() {
+    let html = "<table>";
+    html += "<tr><th>序号</th><th>姓名</th><th>年龄</th><th>性别</th><th>家乡</th></tr>";
+
+    for (let i = 0; i < students.length; i++) {
+      html += "<tr>";
+      html += "<td>" + (i + 1) + "</td>";
+      html += "<td>" + students[i].name + "</td>";
+      html += "<td>" + students[i].age + "</td>";
+      html += "<td>" + students[i].gender + "</td>";
+      html += "<td>" + students[i].hometown + "</td>";
+      html += "</tr>";
+    }
+
+    html += "</table>";
+    document.getElementById("table-container").innerHTML = html;
+  }
+</script>
+
+</body>
+</html>

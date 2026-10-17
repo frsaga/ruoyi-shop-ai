@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.shop.mapper.ShopChatMapper">
+    
+    <resultMap type="com.ruoyi.shop.domain.ShopChat" id="ShopChatResult">
+        <result property="chatId"    column="chat_id"    />
+        <result property="buyerId"    column="buyer_id"    />
+        <result property="sellerId"    column="seller_id"    />
+        <result property="storeId"    column="store_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="messageType"    column="message_type"    />
+        <result property="content"    column="content"    />
+        <result property="senderType"    column="sender_type"    />
+        <result property="senderId"    column="sender_id"    />
+        <result property="isRead"    column="is_read"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="buyerName"    column="buyer_name"    />
+        <result property="sellerName"    column="seller_name"    />
+        <result property="storeName"    column="store_name"    />
+    </resultMap>
+
+    <sql id="selectShopChatVo">
+        select c.chat_id, c.buyer_id, c.seller_id, c.store_id, c.order_id, 
+               c.message_type, c.content, c.sender_type, c.sender_id, c.is_read,
+               c.create_time, c.update_time,
+               u1.nick_name as buyer_name,
+               u2.nick_name as seller_name,
+               s.store_name
+        from shop_chat c
+        left join sys_user u1 on c.buyer_id = u1.user_id
+        left join sys_user u2 on c.seller_id = u2.user_id
+        left join shop_store s on c.store_id = s.store_id
+    </sql>
+
+    <select id="selectShopChatList" parameterType="com.ruoyi.shop.domain.ShopChat" resultMap="ShopChatResult">
+        <include refid="selectShopChatVo"/>
+        <where>  
+            <if test="buyerId != null "> and c.buyer_id = #{buyerId}</if>
+            <if test="sellerId != null "> and c.seller_id = #{sellerId}</if>
+            <if test="storeId != null "> and c.store_id = #{storeId}</if>
+            <if test="orderId != null "> and c.order_id = #{orderId}</if>
+            <if test="messageType != null  and messageType != ''"> and c.message_type = #{messageType}</if>
+            <if test="senderType != null  and senderType != ''"> and c.sender_type = #{senderType}</if>
+            <if test="isRead != null  and isRead != ''"> and c.is_read = #{isRead}</if>
+            and c.del_flag = '0'
+        </where>
+        order by c.create_time desc
+    </select>
+    
+    <select id="selectShopChatByChatId" parameterType="Long" resultMap="ShopChatResult">
+        <include refid="selectShopChatVo"/>
+        where c.chat_id = #{chatId} and c.del_flag = '0'
+    </select>
+
+    <select id="selectChatHistory" resultMap="ShopChatResult">
+        <include refid="selectShopChatVo"/>
+        where c.buyer_id = #{buyerId} and c.seller_id = #{sellerId} 
+        <if test="storeId != null">
+            and c.store_id = #{storeId}
+        </if>
+        and c.del_flag = '0'
+        order by c.create_time asc
+    </select>
+
+    <select id="selectBuyerChatSessions" parameterType="Long" resultMap="ShopChatResult">
+        select 
+            c.seller_id,
+            c.store_id,
+            u2.nick_name as seller_name,
+            s.store_name,
+            max(c.create_time) as create_time,
+            (select count(*) from shop_chat where buyer_id = #{buyerId} 
+             and seller_id = c.seller_id and store_id = c.store_id and is_read = '0' and sender_type = '1' and del_flag = '0') as unread_count
+        from shop_chat c
+        left join sys_user u2 on c.seller_id = u2.user_id
+        left join shop_store s on c.store_id = s.store_id and s.del_flag = '0'
+        where c.buyer_id = #{buyerId} and c.del_flag = '0'
+        group by c.seller_id, c.store_id, u2.nick_name, s.store_name
+        order by max(c.create_time) desc
+    </select>
+
+    <select id="selectSellerChatSessions" parameterType="Long" resultMap="ShopChatResult">
+        select 
+            c.buyer_id,
+            c.seller_id,
+            c.store_id,
+            u1.nick_name as buyer_name,
+            s.store_name,
+            max(c.create_time) as create_time,
+            (select count(*) from shop_chat where seller_id = #{sellerId} 
+             and buyer_id = c.buyer_id and store_id = c.store_id and is_read = '0' and sender_type = '0' and del_flag = '0') as unread_count
+        from shop_chat c
+        left join sys_user u1 on c.buyer_id = u1.user_id
+        left join shop_store s on c.store_id = s.store_id and s.del_flag = '0'
+        where c.seller_id = #{sellerId} and c.del_flag = '0'
+        group by c.buyer_id, c.seller_id, c.store_id, u1.nick_name, s.store_name
+        order by max(c.create_time) desc
+    </select>
+
+    <select id="selectUnreadCount" resultType="int">
+        select count(*) from shop_chat
+        where del_flag = '0' and is_read = '0'
+        <if test="userType == '0'">
+            and buyer_id = #{userId} and sender_type = '1'
+        </if>
+        <if test="userType == '1'">
+            and seller_id = #{userId} and sender_type = '0'
+        </if>
+    </select>
+        
+    <insert id="insertShopChat" parameterType="com.ruoyi.shop.domain.ShopChat" useGeneratedKeys="true" keyProperty="chatId">
+        insert into shop_chat
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="buyerId != null">buyer_id,</if>
+            <if test="sellerId != null">seller_id,</if>
+            <if test="storeId != null">store_id,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="messageType != null">message_type,</if>
+            <if test="content != null">content,</if>
+            <if test="senderType != null">sender_type,</if>
+            <if test="senderId != null">sender_id,</if>
+            <if test="isRead != null">is_read,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="buyerId != null">#{buyerId},</if>
+            <if test="sellerId != null">#{sellerId},</if>
+            <if test="storeId != null">#{storeId},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="messageType != null">#{messageType},</if>
+            <if test="content != null">#{content},</if>
+            <if test="senderType != null">#{senderType},</if>
+            <if test="senderId != null">#{senderId},</if>
+            <if test="isRead != null">#{isRead},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateShopChat" parameterType="com.ruoyi.shop.domain.ShopChat">
+        update shop_chat
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="buyerId != null">buyer_id = #{buyerId},</if>
+            <if test="sellerId != null">seller_id = #{sellerId},</if>
+            <if test="storeId != null">store_id = #{storeId},</if>
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="messageType != null">message_type = #{messageType},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="senderType != null">sender_type = #{senderType},</if>
+            <if test="senderId != null">sender_id = #{senderId},</if>
+            <if test="isRead != null">is_read = #{isRead},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where chat_id = #{chatId}
+    </update>
+
+    <delete id="deleteShopChatByChatId" parameterType="Long">
+        update shop_chat set del_flag = '2' where chat_id = #{chatId}
+    </delete>
+
+    <delete id="deleteShopChatByChatIds" parameterType="String">
+        update shop_chat set del_flag = '2' where chat_id in 
+        <foreach item="chatId" collection="array" open="(" separator="," close=")">
+            #{chatId}
+        </foreach>
+    </delete>
+
+    <update id="markAsRead">
+        update shop_chat set is_read = '1', update_time = now()
+        where buyer_id = #{buyerId} and seller_id = #{sellerId}
+        <if test="storeId != null">
+            and store_id = #{storeId}
+        </if>
+        <if test="userType == '0'">
+            and sender_type = '1'
+        </if>
+        <if test="userType == '1'">
+            and sender_type = '0'
+        </if>
+        and is_read = '0' and del_flag = '0'
+    </update>
+</mapper>
+

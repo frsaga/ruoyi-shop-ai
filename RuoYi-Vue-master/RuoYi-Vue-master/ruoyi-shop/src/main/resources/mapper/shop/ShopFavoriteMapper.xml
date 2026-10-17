@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.shop.mapper.ShopFavoriteMapper">
+    
+    <resultMap type="com.ruoyi.shop.domain.ShopFavorite" id="ShopFavoriteResult">
+        <result property="favoriteId"    column="favorite_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="createTime"    column="create_time"    />
+        <association property="product" javaType="com.ruoyi.shop.domain.ShopProduct">
+            <result property="productId"    column="product_id"    />
+            <result property="productName"    column="product_name"    />
+            <result property="productSubtitle"    column="product_subtitle"    />
+            <result property="price"    column="price"    />
+            <result property="stock"    column="stock"    />
+            <result property="salesCount"    column="sales_count"    />
+            <result property="status"    column="product_status"    />
+            <result property="storeName"    column="store_name"    />
+        </association>
+    </resultMap>
+
+    <sql id="selectShopFavoriteVo">
+        select f.favorite_id, f.user_id, f.product_id, f.create_time,
+               p.product_name, p.product_subtitle, p.price, p.stock, p.sales_count, p.status as product_status,
+               s.store_name
+        from shop_favorite f
+        left join shop_product p on f.product_id = p.product_id
+        left join shop_store s on p.store_id = s.store_id
+    </sql>
+
+    <select id="selectShopFavoriteList" parameterType="com.ruoyi.shop.domain.ShopFavorite" resultMap="ShopFavoriteResult">
+        <include refid="selectShopFavoriteVo"/>
+        <where>  
+            <if test="userId != null "> and f.user_id = #{userId}</if>
+            <if test="productId != null "> and f.product_id = #{productId}</if>
+        </where>
+        order by f.create_time desc
+    </select>
+
+    <select id="selectShopFavoriteListByUserId" parameterType="Long" resultMap="ShopFavoriteResult">
+        <include refid="selectShopFavoriteVo"/>
+        where f.user_id = #{userId}
+        order by f.create_time desc
+    </select>
+    
+    <select id="selectShopFavoriteByFavoriteId" parameterType="Long" resultMap="ShopFavoriteResult">
+        <include refid="selectShopFavoriteVo"/>
+        where f.favorite_id = #{favoriteId}
+    </select>
+
+    <select id="selectShopFavoriteByUserIdAndProductId" resultMap="ShopFavoriteResult">
+        <include refid="selectShopFavoriteVo"/>
+        where f.user_id = #{userId} and f.product_id = #{productId}
+        limit 1
+    </select>
+        
+    <insert id="insertShopFavorite" parameterType="com.ruoyi.shop.domain.ShopFavorite" useGeneratedKeys="true" keyProperty="favoriteId">
+        insert into shop_favorite
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="productId != null">product_id,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="productId != null">#{productId},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <delete id="deleteShopFavoriteByFavoriteId" parameterType="Long">
+        delete from shop_favorite where favorite_id = #{favoriteId}
+    </delete>
+
+    <delete id="deleteShopFavoriteByFavoriteIds" parameterType="String">
+        delete from shop_favorite where favorite_id in 
+        <foreach item="favoriteId" collection="array" open="(" separator="," close=")">
+            #{favoriteId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteShopFavoriteByUserIdAndProductId">
+        delete from shop_favorite where user_id = #{userId} and product_id = #{productId}
+    </delete>
+</mapper>
+

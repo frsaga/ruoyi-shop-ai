@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.shop.mapper.ShopAddressMapper">
+    
+    <resultMap type="com.ruoyi.shop.domain.ShopAddress" id="ShopAddressResult">
+        <result property="addressId"    column="address_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="receiverName"    column="receiver_name"    />
+        <result property="receiverPhone"    column="receiver_phone"    />
+        <result property="province"    column="province"    />
+        <result property="city"    column="city"    />
+        <result property="district"    column="district"    />
+        <result property="address"    column="address"    />
+        <result property="isDefault"    column="is_default"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectShopAddressVo">
+        select address_id, user_id, receiver_name, receiver_phone, province, city, district, address, is_default, del_flag, create_time, update_time
+        from shop_address
+    </sql>
+
+    <select id="selectShopAddressListByUserId" parameterType="Long" resultMap="ShopAddressResult">
+        <include refid="selectShopAddressVo"/>
+        where user_id = #{userId} and del_flag = '0'
+        order by is_default desc, create_time desc
+    </select>
+    
+    <select id="selectShopAddressByAddressId" parameterType="Long" resultMap="ShopAddressResult">
+        <include refid="selectShopAddressVo"/>
+        where address_id = #{addressId} and del_flag = '0'
+    </select>
+        
+    <insert id="insertShopAddress" parameterType="com.ruoyi.shop.domain.ShopAddress" useGeneratedKeys="true" keyProperty="addressId">
+        insert into shop_address
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="receiverName != null and receiverName != ''">receiver_name,</if>
+            <if test="receiverPhone != null and receiverPhone != ''">receiver_phone,</if>
+            <if test="province != null">province,</if>
+            <if test="city != null">city,</if>
+            <if test="district != null">district,</if>
+            <if test="address != null and address != ''">address,</if>
+            <if test="isDefault != null">is_default,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="receiverName != null and receiverName != ''">#{receiverName},</if>
+            <if test="receiverPhone != null and receiverPhone != ''">#{receiverPhone},</if>
+            <if test="province != null">#{province},</if>
+            <if test="city != null">#{city},</if>
+            <if test="district != null">#{district},</if>
+            <if test="address != null and address != ''">#{address},</if>
+            <if test="isDefault != null">#{isDefault},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateShopAddress" parameterType="com.ruoyi.shop.domain.ShopAddress">
+        update shop_address
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="receiverName != null and receiverName != ''">receiver_name = #{receiverName},</if>
+            <if test="receiverPhone != null and receiverPhone != ''">receiver_phone = #{receiverPhone},</if>
+            <if test="province != null">province = #{province},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="district != null">district = #{district},</if>
+            <if test="address != null and address != ''">address = #{address},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where address_id = #{addressId}
+    </update>
+
+    <delete id="deleteShopAddressByAddressId" parameterType="Long">
+        update shop_address set del_flag = '2' where address_id = #{addressId}
+    </delete>
+
+    <delete id="deleteShopAddressByAddressIds" parameterType="String">
+        update shop_address set del_flag = '2' where address_id in 
+        <foreach item="addressId" collection="array" open="(" separator="," close=")">
+            #{addressId}
+        </foreach>
+    </delete>
+
+    <update id="cancelDefaultAddress" parameterType="Long">
+        update shop_address set is_default = '0' where user_id = #{userId}
+    </update>
+</mapper>
+

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.shop.mapper.ShopOrderMapper">
+    
+    <resultMap type="com.ruoyi.shop.domain.ShopOrder" id="ShopOrderResult">
+        <result property="orderId"    column="order_id"    />
+        <result property="orderNo"    column="order_no"    />
+        <result property="userId"    column="user_id"    />
+        <result property="storeId"    column="store_id"    />
+        <result property="receiverName"    column="receiver_name"    />
+        <result property="receiverPhone"    column="receiver_phone"    />
+        <result property="receiverProvince"    column="receiver_province"    />
+        <result property="receiverCity"    column="receiver_city"    />
+        <result property="receiverDistrict"    column="receiver_district"    />
+        <result property="receiverAddress"    column="receiver_address"    />
+        <result property="totalAmount"    column="total_amount"    />
+        <result property="paymentAmount"    column="payment_amount"    />
+        <result property="freight"    column="freight"    />
+        <result property="paymentType"    column="payment_type"    />
+        <result property="paymentTime"    column="payment_time"    />
+        <result property="sendTime"    column="send_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="closeTime"    column="close_time"    />
+        <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="storeName"    column="store_name"    />
+    </resultMap>
+
+    <sql id="selectShopOrderVo">
+        select o.order_id, o.order_no, o.user_id, o.store_id, o.receiver_name, o.receiver_phone, 
+               o.receiver_province, o.receiver_city, o.receiver_district, o.receiver_address,
+               o.total_amount, o.payment_amount, o.freight, o.payment_type, o.payment_time, 
+               o.send_time, o.end_time, o.close_time, o.status, o.del_flag,
+               o.create_by, o.create_time, o.update_by, o.update_time, o.remark,
+               s.store_name
+        from shop_order o
+        left join shop_store s on o.store_id = s.store_id
+    </sql>
+
+    <select id="selectShopOrderList" parameterType="com.ruoyi.shop.domain.ShopOrder" resultMap="ShopOrderResult">
+        <include refid="selectShopOrderVo"/>
+        <where>  
+            o.del_flag = '0'
+            <if test="orderNo != null  and orderNo != ''"> and o.order_no = #{orderNo}</if>
+            <if test="userId != null "> and o.user_id = #{userId}</if>
+            <if test="storeId != null "> and o.store_id = #{storeId}</if>
+            <if test="status != null "> and o.status = #{status}</if>
+        </where>
+        order by o.create_time desc
+    </select>
+    
+    <select id="selectShopOrderByOrderId" parameterType="Long" resultMap="ShopOrderResult">
+        <include refid="selectShopOrderVo"/>
+        where o.order_id = #{orderId} and o.del_flag = '0'
+    </select>
+
+    <select id="selectShopOrderByOrderNo" parameterType="String" resultMap="ShopOrderResult">
+        <include refid="selectShopOrderVo"/>
+        where o.order_no = #{orderNo} and o.del_flag = '0'
+        limit 1
+    </select>
+        
+    <insert id="insertShopOrder" parameterType="com.ruoyi.shop.domain.ShopOrder" useGeneratedKeys="true" keyProperty="orderId">
+        insert into shop_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderNo != null and orderNo != ''">order_no,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="storeId != null">store_id,</if>
+            <if test="receiverName != null">receiver_name,</if>
+            <if test="receiverPhone != null">receiver_phone,</if>
+            <if test="receiverProvince != null">receiver_province,</if>
+            <if test="receiverCity != null">receiver_city,</if>
+            <if test="receiverDistrict != null">receiver_district,</if>
+            <if test="receiverAddress != null">receiver_address,</if>
+            <if test="totalAmount != null">total_amount,</if>
+            <if test="paymentAmount != null">payment_amount,</if>
+            <if test="freight != null">freight,</if>
+            <if test="paymentType != null">payment_type,</if>
+            <if test="paymentTime != null">payment_time,</if>
+            <if test="sendTime != null">send_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="closeTime != null">close_time,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="storeId != null">#{storeId},</if>
+            <if test="receiverName != null">#{receiverName},</if>
+            <if test="receiverPhone != null">#{receiverPhone},</if>
+            <if test="receiverProvince != null">#{receiverProvince},</if>
+            <if test="receiverCity != null">#{receiverCity},</if>
+            <if test="receiverDistrict != null">#{receiverDistrict},</if>
+            <if test="receiverAddress != null">#{receiverAddress},</if>
+            <if test="totalAmount != null">#{totalAmount},</if>
+            <if test="paymentAmount != null">#{paymentAmount},</if>
+            <if test="freight != null">#{freight},</if>
+            <if test="paymentType != null">#{paymentType},</if>
+            <if test="paymentTime != null">#{paymentTime},</if>
+            <if test="sendTime != null">#{sendTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="closeTime != null">#{closeTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateShopOrder" parameterType="com.ruoyi.shop.domain.ShopOrder">
+        update shop_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="receiverName != null">receiver_name = #{receiverName},</if>
+            <if test="receiverPhone != null">receiver_phone = #{receiverPhone},</if>
+            <if test="receiverProvince != null">receiver_province = #{receiverProvince},</if>
+            <if test="receiverCity != null">receiver_city = #{receiverCity},</if>
+            <if test="receiverDistrict != null">receiver_district = #{receiverDistrict},</if>
+            <if test="receiverAddress != null">receiver_address = #{receiverAddress},</if>
+            <if test="totalAmount != null">total_amount = #{totalAmount},</if>
+            <if test="paymentAmount != null">payment_amount = #{paymentAmount},</if>
+            <if test="freight != null">freight = #{freight},</if>
+            <if test="paymentType != null">payment_type = #{paymentType},</if>
+            <if test="paymentTime != null">payment_time = #{paymentTime},</if>
+            <if test="sendTime != null">send_time = #{sendTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="closeTime != null">close_time = #{closeTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where order_id = #{orderId}
+    </update>
+
+    <delete id="deleteShopOrderByOrderId" parameterType="Long">
+        update shop_order set del_flag = '2' where order_id = #{orderId}
+    </delete>
+
+    <delete id="deleteShopOrderByOrderIds" parameterType="String">
+        update shop_order set del_flag = '2' where order_id in 
+        <foreach item="orderId" collection="array" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+</mapper>
+

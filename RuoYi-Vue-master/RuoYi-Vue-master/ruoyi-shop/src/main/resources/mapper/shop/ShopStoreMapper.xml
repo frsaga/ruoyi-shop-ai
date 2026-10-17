@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.shop.mapper.ShopStoreMapper">
+    
+    <resultMap type="com.ruoyi.shop.domain.ShopStore" id="ShopStoreResult">
+        <result property="storeId"    column="store_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="storeName"    column="store_name"    />
+        <result property="storeLogo"    column="store_logo"    />
+        <result property="storeDescription"    column="store_description"    />
+        <result property="storeAddress"    column="store_address"    />
+        <result property="storePhone"    column="store_phone"    />
+        <result property="businessLicense"    column="business_license"    />
+        <result property="status"    column="status"    />
+        <result property="creditScore"    column="credit_score"    />
+        <result property="salesVolume"    column="sales_volume"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectShopStoreVo">
+        select store_id, user_id, store_name, store_logo, store_description, store_address, store_phone, business_license, status, credit_score, sales_volume, del_flag, create_by, create_time, update_by, update_time, remark from shop_store
+    </sql>
+
+    <select id="selectShopStoreList" parameterType="com.ruoyi.shop.domain.ShopStore" resultMap="ShopStoreResult">
+        <include refid="selectShopStoreVo"/>
+        <where>  
+            del_flag = '0'
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="storeName != null  and storeName != ''"> and store_name like concat('%', #{storeName}, '%')</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
+    
+    <select id="selectShopStoreByStoreId" parameterType="Long" resultMap="ShopStoreResult">
+        <include refid="selectShopStoreVo"/>
+        where store_id = #{storeId} and del_flag = '0'
+    </select>
+
+    <select id="selectShopStoreByUserId" parameterType="Long" resultMap="ShopStoreResult">
+        <include refid="selectShopStoreVo"/>
+        where user_id = #{userId} and del_flag = '0'
+        order by create_time desc
+        limit 1
+    </select>
+        
+    <insert id="insertShopStore" parameterType="com.ruoyi.shop.domain.ShopStore" useGeneratedKeys="true" keyProperty="storeId">
+        insert into shop_store
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="storeName != null and storeName != ''">store_name,</if>
+            <if test="storeLogo != null">store_logo,</if>
+            <if test="storeDescription != null">store_description,</if>
+            <if test="storeAddress != null">store_address,</if>
+            <if test="storePhone != null">store_phone,</if>
+            <if test="businessLicense != null">business_license,</if>
+            <if test="status != null">status,</if>
+            <if test="creditScore != null">credit_score,</if>
+            <if test="salesVolume != null">sales_volume,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="storeName != null and storeName != ''">#{storeName},</if>
+            <if test="storeLogo != null">#{storeLogo},</if>
+            <if test="storeDescription != null">#{storeDescription},</if>
+            <if test="storeAddress != null">#{storeAddress},</if>
+            <if test="storePhone != null">#{storePhone},</if>
+            <if test="businessLicense != null">#{businessLicense},</if>
+            <if test="status != null">#{status},</if>
+            <if test="creditScore != null">#{creditScore},</if>
+            <if test="salesVolume != null">#{salesVolume},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateShopStore" parameterType="com.ruoyi.shop.domain.ShopStore">
+        update shop_store
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="storeName != null and storeName != ''">store_name = #{storeName},</if>
+            <if test="storeLogo != null">store_logo = #{storeLogo},</if>
+            <if test="storeDescription != null">store_description = #{storeDescription},</if>
+            <if test="storeAddress != null">store_address = #{storeAddress},</if>
+            <if test="storePhone != null">store_phone = #{storePhone},</if>
+            <if test="businessLicense != null">business_license = #{businessLicense},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="creditScore != null">credit_score = #{creditScore},</if>
+            <if test="salesVolume != null">sales_volume = #{salesVolume},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where store_id = #{storeId}
+    </update>
+
+    <delete id="deleteShopStoreByStoreId" parameterType="Long">
+        update shop_store set del_flag = '2' where store_id = #{storeId}
+    </delete>
+
+    <delete id="deleteShopStoreByStoreIds" parameterType="String">
+        update shop_store set del_flag = '2' where store_id in 
+        <foreach item="storeId" collection="array" open="(" separator="," close=")">
+            #{storeId}
+        </foreach>
+    </delete>
+
+    <!-- 统计店铺下的商品数量 -->
+    <select id="countProductByStoreId" parameterType="Long" resultType="int">
+        select count(1) from shop_product 
+        where store_id = #{storeId} and del_flag = '0'
+    </select>
+
+    <!-- 统计店铺的平均信用评分（基于已发布评价） -->
+    <select id="calculateAverageRatingByStoreId" parameterType="Long" resultType="Double">
+        select AVG(r.rating) as avg_rating
+        from shop_review r
+        inner join shop_product p on r.product_id = p.product_id
+        where p.store_id = #{storeId}
+        and r.status = '1'
+        and r.del_flag = '0'
+        and p.del_flag = '0'
+    </select>
+</mapper>
+

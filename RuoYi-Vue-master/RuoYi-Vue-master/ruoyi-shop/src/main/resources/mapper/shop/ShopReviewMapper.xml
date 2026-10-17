@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.shop.mapper.ShopReviewMapper">
+    
+    <resultMap type="com.ruoyi.shop.domain.ShopReview" id="ShopReviewResult">
+        <result property="reviewId"    column="review_id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="rating"    column="rating"    />
+        <result property="content"    column="content"    />
+        <result property="images"    column="images"    />
+        <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="productName"    column="product_name"    />
+        <result property="userName"    column="user_name"    />
+    </resultMap>
+
+    <sql id="selectShopReviewVo">
+        select r.review_id, r.product_id, r.order_id, r.user_id, r.rating, r.content, r.images, 
+               r.status, r.del_flag, r.create_time, r.update_time,
+               p.product_name,
+               u.user_name
+        from shop_review r
+        left join shop_product p on r.product_id = p.product_id
+        left join sys_user u on r.user_id = u.user_id
+    </sql>
+
+    <select id="selectShopReviewList" parameterType="com.ruoyi.shop.domain.ShopReview" resultMap="ShopReviewResult">
+        <include refid="selectShopReviewVo"/>
+        <where>  
+            r.del_flag = '0'
+            <if test="productId != null "> and r.product_id = #{productId}</if>
+            <if test="orderId != null "> and r.order_id = #{orderId}</if>
+            <if test="userId != null "> and r.user_id = #{userId}</if>
+            <if test="status != null  and status != ''"> and r.status = #{status}</if>
+            <if test="rating != null "> and r.rating = #{rating}</if>
+            <if test="storeId != null "> and p.store_id = #{storeId}</if>
+        </where>
+        order by r.create_time desc
+    </select>
+    
+    <select id="selectShopReviewByReviewId" parameterType="Long" resultMap="ShopReviewResult">
+        <include refid="selectShopReviewVo"/>
+        where r.review_id = #{reviewId} and r.del_flag = '0'
+    </select>
+
+    <select id="selectShopReviewListByProductId" parameterType="Long" resultMap="ShopReviewResult">
+        <include refid="selectShopReviewVo"/>
+        where r.product_id = #{productId} and r.status = '1' and r.del_flag = '0'
+        order by r.create_time desc
+    </select>
+
+    <select id="selectShopReviewListByUserId" parameterType="Long" resultMap="ShopReviewResult">
+        <include refid="selectShopReviewVo"/>
+        where r.user_id = #{userId} and r.del_flag = '0'
+        order by r.create_time desc
+    </select>
+
+    <select id="selectShopReviewListByStoreId" parameterType="Long" resultMap="ShopReviewResult">
+        <include refid="selectShopReviewVo"/>
+        where p.store_id = #{storeId} and r.del_flag = '0'
+        order by r.create_time desc
+    </select>
+        
+    <insert id="insertShopReview" parameterType="com.ruoyi.shop.domain.ShopReview" useGeneratedKeys="true" keyProperty="reviewId">
+        insert into shop_review
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId != null">product_id,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="rating != null">rating,</if>
+            <if test="content != null">content,</if>
+            <if test="images != null">images,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productId != null">#{productId},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="rating != null">#{rating},</if>
+            <if test="content != null">#{content},</if>
+            <if test="images != null">#{images},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateShopReview" parameterType="com.ruoyi.shop.domain.ShopReview">
+        update shop_review
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="rating != null">rating = #{rating},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="images != null">images = #{images},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where review_id = #{reviewId}
+    </update>
+
+    <delete id="deleteShopReviewByReviewId" parameterType="Long">
+        update shop_review set del_flag = '2' where review_id = #{reviewId}
+    </delete>
+
+    <delete id="deleteShopReviewByReviewIds" parameterType="String">
+        update shop_review set del_flag = '2' where review_id in 
+        <foreach item="reviewId" collection="array" open="(" separator="," close=")">
+            #{reviewId}
+        </foreach>
+    </delete>
+</mapper>
+

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.shop.mapper.ShopProductMapper">
+    
+    <resultMap type="com.ruoyi.shop.domain.ShopProduct" id="ShopProductResult">
+        <result property="productId"    column="product_id"    />
+        <result property="storeId"    column="store_id"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="productName"    column="product_name"    />
+        <result property="productSubtitle"    column="product_subtitle"    />
+        <result property="mainImage"    column="main_image"    />
+        <result property="subImages"    column="sub_images"    />
+        <result property="detail"    column="detail"    />
+        <result property="price"    column="price"    />
+        <result property="stock"    column="stock"    />
+        <result property="salesCount"    column="sales_count"    />
+        <result property="status"    column="status"    />
+        <result property="isRecommended"    column="is_recommended"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="storeName"    column="store_name"    />
+        <result property="userId"    column="user_id"    />
+        <result property="categoryName"    column="category_name"    />
+    </resultMap>
+
+    <sql id="selectShopProductVo">
+        select p.product_id, p.store_id, p.category_id, p.product_name, p.product_subtitle, 
+               p.main_image, p.sub_images, p.detail, p.price, p.stock, p.sales_count, 
+               p.status, p.is_recommended, p.del_flag, p.create_by, p.create_time, 
+               p.update_by, p.update_time, p.remark,
+               s.store_name, s.user_id, c.category_name
+        from shop_product p
+        left join shop_store s on p.store_id = s.store_id
+        left join shop_category c on p.category_id = c.category_id
+    </sql>
+
+    <select id="selectShopProductList" parameterType="com.ruoyi.shop.domain.ShopProduct" resultMap="ShopProductResult">
+        <include refid="selectShopProductVo"/>
+        <where>  
+            p.del_flag = '0'
+            <if test="storeId != null "> and p.store_id = #{storeId}</if>
+            <if test="userId != null "> and s.user_id = #{userId}</if>
+            <if test="categoryId != null "> and p.category_id = #{categoryId}</if>
+            <if test="productName != null  and productName != ''"> and p.product_name like concat('%', #{productName}, '%')</if>
+            <if test="status != null  and status != ''"> and p.status = #{status}</if>
+            <if test="isRecommended != null  and isRecommended != ''"> and p.is_recommended = #{isRecommended}</if>
+        </where>
+        order by p.create_time desc
+    </select>
+    
+    <select id="selectShopProductByProductId" parameterType="Long" resultMap="ShopProductResult">
+        <include refid="selectShopProductVo"/>
+        where p.product_id = #{productId} and p.del_flag = '0'
+    </select>
+        
+    <insert id="insertShopProduct" parameterType="com.ruoyi.shop.domain.ShopProduct" useGeneratedKeys="true" keyProperty="productId">
+        insert into shop_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">store_id,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="productName != null and productName != ''">product_name,</if>
+            <if test="productSubtitle != null">product_subtitle,</if>
+            <if test="mainImage != null">main_image,</if>
+            <if test="subImages != null">sub_images,</if>
+            <if test="detail != null">detail,</if>
+            <if test="price != null">price,</if>
+            <if test="stock != null">stock,</if>
+            <if test="salesCount != null">sales_count,</if>
+            <if test="status != null">status,</if>
+            <if test="isRecommended != null">is_recommended,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">#{storeId},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="productName != null and productName != ''">#{productName},</if>
+            <if test="productSubtitle != null">#{productSubtitle},</if>
+            <if test="mainImage != null">#{mainImage},</if>
+            <if test="subImages != null">#{subImages},</if>
+            <if test="detail != null">#{detail},</if>
+            <if test="price != null">#{price},</if>
+            <if test="stock != null">#{stock},</if>
+            <if test="salesCount != null">#{salesCount},</if>
+            <if test="status != null">#{status},</if>
+            <if test="isRecommended != null">#{isRecommended},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateShopProduct" parameterType="com.ruoyi.shop.domain.ShopProduct">
+        update shop_product
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="storeId != null">store_id = #{storeId},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="productName != null and productName != ''">product_name = #{productName},</if>
+            <if test="productSubtitle != null">product_subtitle = #{productSubtitle},</if>
+            <if test="mainImage != null">main_image = #{mainImage},</if>
+            <if test="subImages != null">sub_images = #{subImages},</if>
+            <if test="detail != null">detail = #{detail},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="stock != null">stock = #{stock},</if>
+            <if test="salesCount != null">sales_count = #{salesCount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="isRecommended != null">is_recommended = #{isRecommended},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where product_id = #{productId}
+    </update>
+
+    <delete id="deleteShopProductByProductId" parameterType="Long">
+        update shop_product set del_flag = '2' where product_id = #{productId}
+    </delete>
+
+    <delete id="deleteShopProductByProductIds" parameterType="String">
+        update shop_product set del_flag = '2' where product_id in 
+        <foreach item="productId" collection="array" open="(" separator="," close=")">
+            #{productId}
+        </foreach>
+    </delete>
+
+    <!-- 统计店铺下的商品数量 -->
+    <select id="countProductByStoreId" parameterType="Long" resultType="int">
+        select count(1) from shop_product 
+        where store_id = #{storeId} and del_flag = '0'
+    </select>
+
+    <!-- 统计商品是否有订单 -->
+    <select id="countOrderByProductId" parameterType="Long" resultType="int">
+        select count(1) from shop_order_item 
+        where product_id = #{productId}
+    </select>
+</mapper>
+

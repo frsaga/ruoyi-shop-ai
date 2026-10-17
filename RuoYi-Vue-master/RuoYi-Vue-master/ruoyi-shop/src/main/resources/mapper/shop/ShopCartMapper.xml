@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.shop.mapper.ShopCartMapper">
+    
+    <resultMap type="com.ruoyi.shop.domain.ShopCart" id="ShopCartResult">
+        <result property="cartId"    column="cart_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="checked"    column="checked"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <association property="product" javaType="com.ruoyi.shop.domain.ShopProduct">
+            <result property="productId"    column="product_id"    />
+            <result property="productName"    column="product_name"    />
+            <result property="mainImage"    column="main_image"    />
+            <result property="price"    column="price"    />
+            <result property="stock"    column="stock"    />
+            <result property="status"    column="product_status"    />
+            <result property="storeId"    column="store_id"    />
+            <result property="storeName"    column="store_name"    />
+        </association>
+    </resultMap>
+
+    <sql id="selectShopCartVo">
+        select c.cart_id, c.user_id, c.product_id, c.quantity, c.checked, c.create_time, c.update_time,
+               p.product_name, p.main_image, p.price, p.stock, p.status as product_status,
+               p.store_id, s.store_name
+        from shop_cart c
+        left join shop_product p on c.product_id = p.product_id
+        left join shop_store s on p.store_id = s.store_id
+    </sql>
+
+    <select id="selectShopCartList" parameterType="com.ruoyi.shop.domain.ShopCart" resultMap="ShopCartResult">
+        <include refid="selectShopCartVo"/>
+        <where>  
+            <if test="userId != null "> and c.user_id = #{userId}</if>
+            <if test="productId != null "> and c.product_id = #{productId}</if>
+        </where>
+        order by c.create_time desc
+    </select>
+
+    <select id="selectShopCartListByUserId" parameterType="Long" resultMap="ShopCartResult">
+        <include refid="selectShopCartVo"/>
+        where c.user_id = #{userId}
+        order by c.create_time desc
+    </select>
+    
+    <select id="selectShopCartByCartId" parameterType="Long" resultMap="ShopCartResult">
+        <include refid="selectShopCartVo"/>
+        where c.cart_id = #{cartId}
+    </select>
+
+    <select id="selectShopCartByUserIdAndProductId" resultMap="ShopCartResult">
+        <include refid="selectShopCartVo"/>
+        where c.user_id = #{userId} and c.product_id = #{productId}
+        limit 1
+    </select>
+        
+    <insert id="insertShopCart" parameterType="com.ruoyi.shop.domain.ShopCart" useGeneratedKeys="true" keyProperty="cartId">
+        insert into shop_cart
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="productId != null">product_id,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="checked != null">checked,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="productId != null">#{productId},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="checked != null">#{checked},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateShopCart" parameterType="com.ruoyi.shop.domain.ShopCart">
+        update shop_cart
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="checked != null">checked = #{checked},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where cart_id = #{cartId}
+    </update>
+
+    <delete id="deleteShopCartByCartId" parameterType="Long">
+        delete from shop_cart where cart_id = #{cartId}
+    </delete>
+
+    <delete id="deleteShopCartByCartIds" parameterType="String">
+        delete from shop_cart where cart_id in 
+        <foreach item="cartId" collection="array" open="(" separator="," close=")">
+            #{cartId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteShopCartByUserId" parameterType="Long">
+        delete from shop_cart where user_id = #{userId}
+    </delete>
+</mapper>
+

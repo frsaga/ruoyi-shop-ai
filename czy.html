@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>个人简历</title>
+<style>
+body{
+  font-family:"微软雅黑";
+  background:#f0f0f0;
+}
+.box{
+  width:900px;
+  margin:30px auto;
+  background:#fff;
+  border:1px solid #ccc;
+  padding:20px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+th,td{
+  border:1px solid #ccc;
+  padding:8px;
+  text-align:left;
+}
+th{
+  background:#f9f9f9;
+  width:120px;
+}
+input[type=text],
+input[type=tel],
+input[type=number],
+input[type=date],
+select,
+textarea{
+  width:95%;
+  padding:6px;
+  border:1px solid #ccc;
+}
+textarea{
+  height:70px;
+}
+.radio-box{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.photo{
+  text-align:center;
+}
+.photo-box{
+  width:130px;
+  height:150px;
+  border:1px dashed #aaa;
+  background:#fafafa;
+  line-height:150px;
+  color:#999;
+  margin:0 auto 10px;
+  font-size:14px;
+}
+.photo-box img{
+  width:130px;
+  height:150px;
+  object-fit:cover;
+}
+.btn{
+  display:block;
+  margin:25px auto;
+  width:180px;
+  height:40px;
+  background:#007bff;
+  color:#fff;
+  border:none;
+  font-size:16px;
+  cursor:pointer;
+}
+.btn:hover{
+  background:#0056b3;
+}
+.red{
+  color:red;
+  margin-right:3px;
+}
+</style>
+</head>
+
+<body>
+<div class="box">
+<form id="resumeForm" method="post" enctype="multipart/form-data">
+<table>
+<tr>
+  <th colspan="5" style="text-align:center; font-size:20px; background:#e9f2ff;">个人简历</th>
+</tr>
+
+<tr>
+  <th><span class="red">*</span>姓名</th>
+  <td><input type="text" name="name" placeholder="请输入姓名"></td>
+  <th><span class="red">*</span>电话</th>
+  <td><input type="tel" name="phone" placeholder="请输入手机号"></td>
+  <td rowspan="3" class="photo">
+    <div class="photo-box" id="showImg">上传照片</div>
+    <input type="file" name="photo" accept="image/*" onchange="showPhoto(event)">
+  </td>
+</tr>
+
+<tr>
+  <th><span class="red">*</span>性别</th>
+  <td>
+    <div class="radio-box">
+      <label><input type="radio" name="sex" value="男" checked> 男</label>
+      <label><input type="radio" name="sex" value="女"> 女</label>
+    </div>
+  </td>
+  <th><span class="red">*</span>年龄</th>
+  <td><input type="number" name="age" placeholder="年龄"></td>
+</tr>
+
+<tr>
+  <th><span class="red">*</span>出生日期</th>
+  <td><input type="date" name="birth"></td>
+  <th><span class="red">*</span>现居住地</th>
+  <td>
+    <select name="address">
+      <option value="">请选择省份</option>
+      <option>江西省</option>
+      <option>浙江省</option>
+      <option>广东省</option>
+      <option>江苏省</option>
+      <option>北京市</option>
+    </select>
+  </td>
+</tr>
+
+<tr>
+  <th>个人简介</th>
+  <td colspan="4">
+    <textarea name="info" placeholder="请填写个人简介，例如教育背景、技能特长等"></textarea>
+  </td>
+</tr>
+
+<tr>
+  <th colspan="5" style="text-align:center;background:#f2f2f2;">教育经历</th>
+</tr>
+
+<tr>
+  <th>小学名称</th>
+  <td><input type="text" name="primary" placeholder="小学名称"></td>
+  <th>起止时间</th>
+  <td colspan="2"><input type="text" name="ptime" placeholder="如2000-2006"></td>
+</tr>
+
+<tr>
+  <th>中学名称</th>
+  <td><input type="text" name="middle" placeholder="中学名称"></td>
+  <th>起止时间</th>
+  <td colspan="2"><input type="text" name="mtime" placeholder="如2006-2009"></td>
+</tr>
+
+<tr>
+  <th>大学名称</th>
+  <td><input type="text" name="university" placeholder="大学名称"></td>
+  <th>起止时间</th>
+  <td colspan="2"><input type="text" name="utime" placeholder="如2009-2013"></td>
+</tr>
+
+<tr>
+  <th>专业名称</th>
+  <td colspan="4"><input type="text" name="major" placeholder="请输入专业名称"></td>
+</tr>
+</table>
+
+<input type="submit" class="btn" value="提交简历">
+</form>
+</div>
+
+<script>
+function showPhoto(e){
+  var file=e.target.files[0];
+  var box=document.getElementById("showImg");
+  if(file){
+    var reader=new FileReader();
+    reader.onload=function(x){
+      box.innerHTML='<img src="'+x.target.result+'">';
+    }
+    reader.readAsDataURL(file);
+  }else{
+    box.innerHTML="上传照片";
+  }
+}
+
+document.getElementById("resumeForm").onsubmit=function(e){
+  var name=document.getElementsByName("name")[0].value.trim();
+  var phone=document.getElementsByName("phone")[0].value.trim();
+  var age=document.getElementsByName("age")[0].value.trim();
+  var birth=document.getElementsByName("birth")[0].value.trim();
+  var address=document.getElementsByName("address")[0].value.trim();
+  var sexs=document.getElementsByName("sex");
+  var sexChecked=false;
+  for(var i=0;i<sexs.length;i++){
+    if(sexs[i].checked){sexChecked=true;break;}
+  }
+
+  if(!name || !phone || !age || !birth || !address || !sexChecked){
+    alert("有必填项未填写，请检查！");
+    e.preventDefault();
+    return false;
+  }
+}
+</script>
+
+</body>
+</html>

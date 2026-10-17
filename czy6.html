@@ -1,0 +1,23 @@
+<template>
+    <table>
+      <tr>
+        <th>商品名称</th>
+        <th>价格</th>
+      </tr>
+  
+      <tr v-for="item in products" 
+        <td>{{ item.name }}</td>
+        <td>{{ item.price }}</td>
+
+      </tr>
+    </table>
+  </template>
+  
+  <script setup lang="ts">
+  const products = [
+    { id: 1, name: '苹果', price: 6 },
+    { id: 2, name: '香蕉', price: 3 },
+    { id: 5, name: '牛奶', price: 12 },
+  ]
+  </script>
+  
